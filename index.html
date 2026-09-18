@@ -2,14 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Happy 5 Year Anniversary!</title>
+  <meta name="theme-color" content="#f6f6f6" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body class="page page-home">
+<body class="page page-home" data-page="home">
   <main class="home">
-    <div class="photo photo-a"><img src="photos/pic1.jpg" alt="Photo 1"></div>
-    <div class="photo photo-b"><img src="photos/pic2.jpg" alt="Photo 2"></div>
+    <div class="photo photo-a"><img src="photos/pic1-1200.jpg" alt="Photo 1"></div>
+    <div class="photo photo-b"><img src="photos/pic2-1200.jpg" alt="Photo 2"></div>
 
     <section class="hero">
       <h1>Happy 5 Year<br/>Anniversary!</h1>
@@ -17,6 +20,6 @@
     </section>
   </main>
 
-  <script src="app.js" defer></script>
+  <script type="module" src="app.js"></script>
 </body>
 </html>

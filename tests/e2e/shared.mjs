@@ -1,0 +1,46 @@
+// Scenario: two devices paired through the fake Supabase (tests/e2e/fakeSupabaseServer.mjs).
+import { sleep, check } from "./browser.mjs";
+export async function run({ makePage, base, fake }) {
+  const init = (u) => `window.__plushClientFactory = () => import('/tests/e2e/fakeClient.js').then(m => m.createFakeClient({ base: '${fake}', userId: '${u}' }));`;
+  const A = await makePage({ name: "A", init: init("user-a-" + Date.now()) });
+  const B = await makePage({ name: "B", init: init("user-b-" + Date.now()) });
+  await A.goto(`${base}/surprise.html?local=1`, 500);
+  await A.click('#dock [data-action="nibble"]', 300);
+  await A.goto(`${base}/surprise.html`);
+  check((await A.eval(`document.querySelector('.sheet h2')?.textContent`)) === "Set up your Plush home", "pairing sheet opens when not a member");
+  await A.eval(`[...document.querySelectorAll('.sheet .btn')].find(b=>b.textContent==='Start a new Plush').click()`); await sleep(300);
+  await A.eval(`document.querySelector('.sheet input[type=text]').value='Sam'; [...document.querySelectorAll('.sheet .btn')].find(b=>b.textContent==='Create').click()`); await sleep(800);
+  const code = await A.eval(`document.querySelector('.sheet .code')?.textContent`);
+  check(/^PLUSH-[A-Z0-9]{4}$/.test(code), "invite code shown: " + code);
+  await A.eval(`[...document.querySelectorAll('.sheet .btn')].find(b=>b.textContent==='Continue').click()`); await sleep(800);
+  check((await A.eval(`window.plush.state.bites.count`)) === 1, "local Plush was brought over (bite kept)");
+  await B.goto(`${base}/surprise.html?join=${code}`);
+  check((await B.eval(`document.querySelector('.sheet input').value`)) === code, "deep link prefilled the code");
+  await B.eval(`document.querySelectorAll('.sheet input[type=text]')[1].value='Alex'; [...document.querySelectorAll('.sheet .btn')].find(b=>b.textContent==='Join').click()`); await sleep(1500);
+  check((await B.eval(`window.plush.snapshot.partners.map(p=>p.name).join(',')`)) === "Sam,Alex", "B joined as second partner");
+  await sleep(800);
+  check((await A.eval(`window.plush.snapshot.partners.length`)) === 2, "A sees the new partner");
+  await A.click('#dock [data-action="feed"]', 1500);
+  check((await B.eval(`Math.round(window.plush.state.needs.fullness)`)) === 100 && /Sam fed Plush/.test(await B.eval(`document.querySelector('#toast').textContent`)), "B received A's feed live with a toast");
+  await Promise.all([A.eval(`document.querySelector('#dock [data-action="play"]').click()`), B.eval(`document.querySelector('#dock [data-action="cuddle"]').click()`)]);
+  await sleep(2500);
+  const va = await A.eval(`window.plush.version`), vb = await B.eval(`window.plush.version`);
+  const na = await A.eval(`JSON.stringify(Object.fromEntries(Object.entries(window.plush.state.needs).map(([k,v])=>[k,Math.round(v)])))`);
+  const nb = await B.eval(`JSON.stringify(Object.fromEntries(Object.entries(window.plush.state.needs).map(([k,v])=>[k,Math.round(v)])))`);
+  check(va === vb && na === nb, `simultaneous actions converge (v=${va}, ${na})`);
+  check((await A.eval(`window.plush.syncer.outbox.length + window.plush.syncer.outbox.length`)) === 0, "outboxes empty");
+  await B.eval(`window.__realFetch = window.fetch; window.fetch = () => Promise.reject(new TypeError('Failed to fetch'));`);
+  await B.click('#dock [data-action="nibble"]', 600); await B.click('#dock [data-action="nibble"]', 600);
+  check(/offline · 2 waiting/.test(await B.eval(`document.querySelector('#conn').textContent`)), "offline pill shows two waiting");
+  await B.eval(`window.fetch = window.__realFetch; window.dispatchEvent(new Event('online'))`); await sleep(2500);
+  check((await B.eval(`window.plush.syncer.outbox.length`)) === 0, "outbox flushed after reconnect");
+  check((await A.eval(`window.plush.state.bites.count`)) === (await B.eval(`window.plush.state.bites.count`)), "A received the queued nibbles");
+  await B.click("#menuBtn", 300);
+  await B.eval(`[...document.querySelectorAll('.sheet .item')].find(b=>b.textContent==='Settings').click()`); await sleep(300);
+  await B.eval(`document.querySelector('.sheet input[type=text]').value='Alexa'; [...document.querySelectorAll('.sheet .btn')].find(b=>b.textContent==='Save').click()`); await sleep(1800);
+  check(/Alexa/.test(await A.eval(`window.plush.snapshot.partners.map(p=>p.name).join(',')`)), "A sees B's renamed partner");
+  await B.goto(`${base}/surprise.html`, 800);
+  check((await B.eval(`window.plush.me().name`)) === "Alexa", "B reloads into the same home");
+  const errs = [...A.errors, ...B.errors];
+  check(errs.length === 0, "no runtime errors: " + errs.join(" | "));
+}

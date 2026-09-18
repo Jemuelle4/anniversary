@@ -4,6 +4,7 @@ export function hasSupabaseConfig(config) {
   return !!(config?.SUPABASE_URL && config?.SUPABASE_ANON_KEY);
 }
 export function getClient(config) {
+  if (globalThis.__plushClientFactory) return Promise.resolve(globalThis.__plushClientFactory()); // test hook (tests/e2e)
   if (!clientPromise) {
     clientPromise = import("https://esm.sh/@supabase/supabase-js@2").then(({ createClient }) =>
       createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY, { auth: { persistSession: true, autoRefreshToken: true } }));

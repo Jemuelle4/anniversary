@@ -58,6 +58,7 @@ docs/
 npm run serve      # python3 -m http.server 8000 → http://localhost:8000/
 npm test           # all node --test suites: tests/**/*.test.js (Node 22.13+)
 npm run test:db    # only the SQLite DB harness in tests/db/
+npm run e2e        # headless Chromium scenarios (local + two-device via fake Supabase)
 ```
 
 Test tiers and what is deferred until Supabase is available: `docs/testing-strategy.md`.

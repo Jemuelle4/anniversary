@@ -1,0 +1,41 @@
+// Scenario: single device, local store (phase 1 + local phase 3/4 features).
+import { sleep, check } from "./browser.mjs";
+export async function run({ makePage, base }) {
+  const p = await makePage({ name: "local" });
+  await p.goto(`${base}/surprise.html?local=1`);
+  check((await p.eval(`document.querySelectorAll('.meter').length`)) === 4, "four meters render");
+  check((await p.eval(`document.querySelectorAll('#dock button').length`)) === 6, "six dock buttons");
+  await p.click('#dock [data-action="feed"]', 1000);
+  check((await p.eval(`window.plush.state.needs.fullness`)) === 100, "feed raised fullness to 100");
+  check((await p.eval(`document.querySelector('#dock [data-action="feed"]').textContent`)) === "Feed", "label revealed on first tap");
+  await p.click('#dock [data-action="play"]', 1500);
+  for (let i = 0; i < 3; i++) await p.click('#dock [data-action="nibble"]', 350);
+  check((await p.eval(`window.plush.state.bites.count`)) === 3, "three bites recorded");
+  check((await p.eval(`(document.querySelector('.plush.single').style.maskImage || document.querySelector('.plush.single').style.webkitMaskImage).startsWith('url(')`)), "bite mask applied to sprite");
+  await p.click('#dock [data-action="boom"]', 2600);
+  check((await p.eval(`window.plush.state.bites.count`)) === 0 && (await p.eval(`!!document.querySelector('.plush.single')`)), "boom cleared bites and the sprite came back");
+  await p.click('#dock [data-action="boom"]', 300);
+  check(/recharging/.test(await p.eval(`document.querySelector('#toast').textContent`)), "boom cooldown toast");
+  await p.click('#dock [data-action="sleep"]', 600);
+  check((await p.eval(`window.plush.state.asleep && document.querySelectorAll('.zz').length === 3`)), "sleep shows z's");
+  await p.click('#dock [data-action="feed"]', 600);
+  check(!(await p.eval(`window.plush.state.asleep`)), "tapping another action while asleep wakes Plush");
+  await p.goto(`${base}/surprise.html?local=1`);
+  check((await p.eval(`window.plush.snapshot.events.length`)) >= 7, "events persisted across reload");
+  await p.eval(`(()=>{const s=JSON.parse(localStorage.getItem('plush.v1.state')); s.updatedAt = Date.now()-30*3600e3; localStorage.setItem('plush.v1.state', JSON.stringify(s));})()`);
+  await p.goto(`${base}/surprise.html?local=1`);
+  check((await p.eval(`document.querySelector('#hud .mood').textContent`)) === "Sulky", "30h away -> Sulky");
+  check((await p.eval(`document.querySelector('.thought')?.textContent`)) === "🍞", "thought bubble shows the lowest need");
+  await p.click("#menuBtn", 300);
+  await p.eval(`[...document.querySelectorAll('.sheet .item')].find(b=>b.textContent==='Settings').click()`); await sleep(300);
+  await p.eval(`(()=>{const iso=new Date().toISOString().slice(0,10); document.querySelector('.sheet input[type=date]').value='2021'+iso.slice(4); document.querySelector('.sheet input[type=text]').value='Sam'; [...document.querySelectorAll('.sheet .btn')].find(b=>b.textContent==='Save').click();})()`); await sleep(1000);
+  check(/Happy 5 Year/.test(await p.eval(`document.querySelector('.banner')?.textContent`)), "anniversary banner");
+  await p.goto(`${base}/memories.html?local=1`);
+  check((await p.eval(`document.querySelectorAll('.mem-card').length`)) === 1, "anniversary memory listed");
+  await p.goto(`${base}/actions.html`, 600);
+  await p.click("[data-action=explode]", 1200);
+  check(await p.eval(`!!document.querySelector('.plush.single')`), "playground still works");
+  await p.goto(`${base}/index.html`, 600);
+  check(/Happy 5 Year/.test(await p.eval(`document.querySelector('.hero h1').textContent`)), "landing headline follows anniversary date");
+  check(p.errors.length === 0, "no runtime errors: " + p.errors.join(" | "));
+}

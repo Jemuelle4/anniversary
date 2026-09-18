@@ -47,7 +47,25 @@ Status values: `pending` (not started), `in progress` (partially written, see no
 - [x] `docs/ui-spec.md`
 - [x] `docs/build-agent-guide.md`
 
-## Final state of this session
+## Implementation status (2026-09-18, later in the same session)
+
+All four phases are implemented on this branch. Verified in this environment:
+
+| Area | Status | How verified |
+|---|---|---|
+| Phase 1 core loop (`src/game`, `LocalStore`, pet page, playground) | done | `npm test` (72 tests) + `npm run e2e` local scenario |
+| Phase 2 shared sync (`SupabaseStore`, outbox/Syncer, Realtime, pairing, feed, presence) | done, **not run against a real Supabase project** | outbox/syncer unit tests; `npm run e2e` shared scenario against `tests/e2e/fakeSupabaseServer.mjs` (SQLite harness behind HTTP) |
+| Phase 2 SQL (`supabase/migrations/0001`) | written, **not applied anywhere** | semantics mirrored by `tests/db/localDb.js`; `tests/rpcSignatures.test.js` checks names/params |
+| Phase 3 growth (points, levels, rituals, streaks, memories, anniversary) | done | `tests/progress.test.js`; e2e covers anniversary + memories page (local + fake) |
+| Phase 3 SQL (`0002_memories.sql`, storage policies) | written, not applied | static only |
+| Phase 4 PWA (`sw.js`, manifest, icons), accessibility, error states, `vercel.json` | done | manual review; SW not exercised in headless runs |
+| Phase 4 reminders (`0003_push.sql`, `supabase/functions/nudge`) | written, **not deployed or run** (no Deno here) | `decay.ts` pinned to shared vectors; JS side tested |
+| Deploy to Vercel | not done (needs the user's go-ahead) | — |
+
+Known gaps: Tier C Supabase integration tests do not exist yet (see `docs/testing-strategy.md` §5);
+Lighthouse not run; real-phone push not tested. Presence in the e2e fake is a no-op.
+
+## Final state of the design part of this session
 
 Follow-up: per user request, a local SQLite harness (`tests/db/`, `node:sqlite`, no
 dependencies) was added to test the DB architecture without Supabase, and
@@ -60,8 +78,8 @@ and `CLAUDE.md` now points build agents at `docs/`. No application code was writ
 
 ## In-progress notes / next step
 
-All planned docs are done. Next for a build session: implement phase 1 per
-`docs/phase-1-core-loop.md` following `docs/build-agent-guide.md`.
+All docs and all phases are implemented. Next: apply the migrations to a real Supabase
+project, fill `config.js`, run the Tier C tests from `docs/testing-strategy.md` §5, then deploy.
 
 ## Decisions made so far (summary; details live in the docs)
 

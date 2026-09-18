@@ -12,6 +12,7 @@ import { readFileSync } from "node:fs";
 import { randomUUID, randomInt } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
+import { isValidState } from "../../src/game/state.js";
 
 const SCHEMA = readFileSync(join(dirname(fileURLToPath(import.meta.url)), "schema.sql"), "utf8");
 const CODE_ALPHABET = "23456789ABCDEFGHJKMNPQRSTUVWXYZ";
@@ -29,26 +30,8 @@ export function makeInviteCode(rng = () => randomInt(CODE_ALPHABET.length)) {
   return s;
 }
 
-// Mirrors is_valid_state(jsonb) in docs/data-model.md §1. Accepts schema versions 1-3 so the
-// harness is usable before phase 3 lands; Postgres should accept the current version only.
-export function isValidState(state) {
-  if (!state || typeof state !== "object") return false;
-  if (![1, 2, 3].includes(state.version)) return false;
-  const needs = state.needs;
-  if (!needs) return false;
-  for (const n of ["fullness", "fun", "love", "energy"]) {
-    const v = needs[n];
-    if (typeof v !== "number" || !Number.isFinite(v) || v < 0 || v > 100) return false;
-  }
-  if (typeof state.asleep !== "boolean") return false;
-  const c = state.bites?.count;
-  if (!Number.isInteger(c) || c < 0 || c > 20) return false;
-  if (state.version === 3) {
-    const lvl = state.progress?.level;
-    if (!Number.isInteger(lvl) || lvl < 1 || lvl > 10) return false;
-  }
-  return true;
-}
+// Mirrors is_valid_state(jsonb) in supabase/migrations/0001 — the real JS implementation.
+export { isValidState };
 
 function iso(ms) { return new Date(ms).toISOString(); }
 
@@ -173,6 +156,25 @@ export function resetHome(db, { userId, newState, now = Date.now() }) {
 /** RPC leave_home() */
 export function leaveHome(db, { userId }) {
   db.prepare("DELETE FROM members WHERE user_id = ?").run(userId);
+}
+
+/** RPC update_home(p_timezone, p_anniversary_date) */
+export function updateHome(db, { userId, timezone = null, anniversaryDate = null, now = Date.now() }) {
+  return tx(db, () => {
+    const m = member(db, userId); if (!m) throw rpcError("not_member");
+    db.prepare("UPDATE homes SET timezone = COALESCE(NULLIF(?, ''), timezone), anniversary_date = ? WHERE id = ?").run(timezone, anniversaryDate, m.home_id);
+    const cur = stateRow(db, m.home_id);
+    advance(db, { homeId: m.home_id, partnerId: m.partner_id, type: "settings", clientAt: now, payload: { timezone, anniversary_date: anniversaryDate }, newState: cur.state });
+    return homeSnapshot(db, { userId });
+  });
+}
+/** RPC update_partner(p_name, p_color) */
+export function updatePartner(db, { userId, name = null, color = null }) {
+  return tx(db, () => {
+    const m = member(db, userId); if (!m) throw rpcError("not_member");
+    db.prepare("UPDATE partners SET name = COALESCE(NULLIF(?, ''), name), color = COALESCE(?, color) WHERE id = ?").run(name, color, m.partner_id);
+    return homeSnapshot(db, { userId });
+  });
 }
 
 /** RPC home_snapshot() */

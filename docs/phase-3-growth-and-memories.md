@@ -1,6 +1,6 @@
 # Phase 3 — Growth, rituals, streaks, and memories
 
-Status: **done** (spec). Implementation: not started. Requires phases 1–2.
+Status: **done** (spec). Implementation: **done** (local mode fully; Supabase memories/storage written but unapplied).
 
 ## 1. Goal
 
@@ -196,3 +196,10 @@ On the anniversary day (home local time):
   "who cares more" scoreboard in the UI.
 - Memories are never deleted in phase 3; a delete RPC is a phase 4 settings item.
 - Storage free tier (1 GB) is far above a couple's photo usage at ~300 KB per photo.
+
+## Implementation notes
+
+- Local mode keeps memories in `localStorage` (`plush.v1.memories`) with photos as data URLs
+  so the journal works before a backend exists.
+- The `joined` auto memory is not created (the `join` event in the activity feed covers it).
+- Anniversary years are computed from the home's `anniversary_date` in the home timezone.

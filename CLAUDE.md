@@ -4,22 +4,67 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-A small static anniversary web app: plain HTML/CSS/JS with no build step, bundler, or dependencies. Open any `.html` file directly in a browser (or serve the directory with any static file server) to run it. `npm test` runs the Node built-in test runner over `tests/**/*.test.js` (Node 22.13+; `tests/db/` is a SQLite harness for the planned database, see `docs/testing-strategy.md`).
+Plush: a shared, persistent virtual pet that grew out of a static anniversary page. Plain
+HTML/CSS/JS with ES modules, **no bundler and no dependencies**. The only runtime dependency
+is `@supabase/supabase-js` loaded from esm.sh when a Supabase project is configured.
 
-## Architecture
+- Run: `npm run serve` (python http.server on :8000) and open `http://localhost:8000/`.
+  ES modules do not load over `file://`, so always serve the directory.
+- Unit tests: `npm test` (Node 22.13+, built-in runner, `tests/**/*.test.js`).
+- DB harness only: `npm run test:db` (SQLite mirror of the Postgres schema and RPCs).
+- Browser end-to-end: `npm run e2e` (headless Chromium via DevTools protocol; expects a
+  Chromium binary at `/opt/pw-browsers/chromium` or `$CHROMIUM`).
 
-- `index.html` — landing page with two photos and a "Surprise!" button that navigates to `surprise.html`.
-- `surprise.html` / `actions.html` — identical "stage" pages (a `<div id="stage">` plus a dock of action buttons) that differ only in their back-navigation target and are both driven by the same script.
-- `app.js` — single shared script loaded by every page. `wireNav()` handles `[data-nav]` buttons (page-to-page navigation via `navTo()`); `wireActions()` handles `[data-action]` buttons on the stage pages, dispatching through `actionMap` to one of four animation functions: `runExplode`, `runBite`, `runThrow`, `runLove`. Each function spawns a `plush` image (`plush.png`) into the stage `<div>` and animates it with a mix of CSS classes (see `styles.css`) and, for `runThrow`, a hand-rolled `requestAnimationFrame` physics loop (gravity/bounce/friction). `runBite` maintains module-level state (`biteState`, `biteBites`) representing a spiral of bite marks applied as an SVG mask (`svgMaskDataUrl`/`applyBiteMask`) that persists across clicks until the plush is fully "eaten," then resets.
-- `styles.css` — all visual/animation styling (keyframes for pop/shake/explode/chomp/fade-out, particle bursts, hearts, dock/button styling) referenced by the class names `app.js` toggles.
-- `photos/` — static images referenced by `index.html`.
+Design docs and specs live in `docs/` (start at `docs/STATUS.md`).
 
-There is no routing framework: navigation between pages is literal `window.location.href` changes between static HTML files.
+## Modes
 
-## Planned product: Plush (design docs)
+`src/pet.js` picks a store at boot: with `config.js` filled in it uses Supabase (shared
+between the two partners); with an empty config or `?local=1` it uses `localStorage`
+(single device). Everything else is identical.
 
-The app is being evolved into "Plush", a shared, persistent virtual pet for the couple.
-The design and implementation-ready specs live under `docs/`. Start with `docs/STATUS.md`,
-then `docs/product-brief.md`, then `docs/build-agent-guide.md` before implementing any
-phase. The architecture notes above describe the current code, which phase 1 refactors
-into ES modules under `src/` (see `docs/phase-1-core-loop.md`).
+## Pages
+
+- `index.html` — the original anniversary landing (photos + "Surprise!"). Kept as the gift.
+  Only change: the year number follows the home's anniversary date when one is cached.
+- `surprise.html` — **Plush**. Top bar, HUD (meters, mood, level, rituals), stage, 3×2 dock.
+- `actions.html` — Playground: the original stateless sandbox, nothing here counts.
+- `memories.html` — journal of auto milestones and manual moments.
+
+## Layout
+
+```
+app.js                  entry; picks the page by <body data-page>; registers sw.js
+config.js               public Supabase URL/anon key, SITE_URL, VAPID public key (empty = local mode)
+src/game/               pure rules, no DOM/timers/network: constants, state (create/migrate/validate),
+                        decay (lazy, timestamp based), actions (six actions + effectsFor), mood,
+                        bites (seeded spiral mask), progress (points/levels/rituals/streaks), time (tz days), copy
+src/store/              Store contract; LocalStore (localStorage); SupabaseStore (RPC-only writes, Realtime)
+src/sync/               outbox reducer (rebase on version conflicts), Syncer flush loop, clock offset, CDN client
+src/ui/                 stage (animations ported from the original app.js), hud, dock, toast, sheet,
+                        pairing, feed, settings, menu, moments, photo resize, push
+src/pet.js              Plush page controller; src/memories.js; src/playground.js
+sw.js, manifest.webmanifest, icons/   PWA (bump SW_VERSION in sw.js on every deploy)
+supabase/migrations/    0001 homes+RPCs, 0002 memories+storage, 0003 push subscriptions
+supabase/functions/nudge  hourly web-push reminder (Deno); decay.ts is pinned to tests/fixtures/decay-vectors.json
+tests/                  unit tests; tests/db = SQLite harness; tests/e2e = browser scenarios + fake Supabase
+vercel.json             static hosting headers
+```
+
+## Rules
+
+- Keep game arithmetic in `src/game/**` only; UI renders state and dispatches actions.
+- Every state write goes through `applyAction` → `store.commit`; the Supabase side is a
+  compare-and-swap RPC (`commit_action`), and the client rebases on `version` conflicts.
+- Keep `tests/db/schema.sql` and `tests/db/localDb.js` in lock-step with the migrations;
+  `tests/rpcSignatures.test.js` checks RPC names/params statically.
+- Never add a build step, TypeScript compilation for the app, or npm dependencies.
+- The landing page's look and the "Click!" label reveal are part of the original gift; keep them.
+
+## Supabase setup (when a project is available)
+
+1. Apply `supabase/migrations/0001..0003` in order (SQL editor, CLI, or MCP tooling).
+2. Fill `config.js` with the project URL and anon key (and `SITE_URL`).
+3. Optional reminders: generate VAPID keys, set function secrets, deploy `nudge`, schedule hourly
+   (see the comment in `0003_push.sql`), put the public key in `config.js`.
+4. Run the deferred integration tests in `docs/testing-strategy.md` §5 (Tier C) — none exist yet.

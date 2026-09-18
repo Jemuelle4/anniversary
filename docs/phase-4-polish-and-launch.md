@@ -1,6 +1,6 @@
 # Phase 4 — Polish, reminders, and launch
 
-Status: **done** (spec). Implementation: not started. Requires phases 1–3 (reminders
+Status: **done** (spec). Implementation: **done except deploy and real-device checks** (see the launch checklist). Requires phases 1–3 (reminders
 depend on phase 2 only; the rest can be built in parallel with phase 3).
 
 ## 1. Goal
@@ -136,13 +136,13 @@ My name · my colour · home timezone · anniversary date · reminders (with qui
 
 - [ ] Migrations 0001–0003 applied; RLS verified per phase 2 SQL checks.
 - [ ] `config.js` has URL, anon key, site URL, optional VAPID public key.
-- [ ] `node --test` green; Deno test for `nudge` green against the shared vector file.
+- [x] `npm test` green. Deno test for `nudge` written (`decay_test.ts`); not run here (no Deno).
 - [ ] Lighthouse: PWA installable, Accessibility ≥ 90, Performance ≥ 85 on mobile.
 - [ ] Two real phones: install, pair, feed on one, see it on the other, background both,
       receive one reminder after needs drop (simulate by SQL-updating `state`).
 - [ ] Offline test on a phone: airplane mode, cuddle, back online, event lands.
-- [ ] `CLAUDE.md` updated with SW version bump rule, deploy steps, and the migration list.
-- [ ] The original gift path still works: open `/`, see the photos and headline, tap
+- [x] `CLAUDE.md` updated with SW version bump rule, deploy steps, and the migration list.
+- [x] The original gift path still works: open `/`, see the photos and headline, tap
       Surprise.
 
 ## 10. Assumptions

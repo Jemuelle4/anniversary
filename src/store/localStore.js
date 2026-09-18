@@ -1,7 +1,7 @@
 import { migrate } from "../game/state.js";
 import { eventRowFrom } from "./store.js";
 
-export const LOCAL_KEYS = { state: "plush.v1.state", events: "plush.v1.events", meta: "plush.v1.meta", migrated: "plush.v1.state.migrated" };
+export const LOCAL_KEYS = { state: "plush.v1.state", events: "plush.v1.events", meta: "plush.v1.meta", migrated: "plush.v1.state.migrated", memories: "plush.v1.memories" };
 const LOCAL_PARTNER = { id: "local", name: "You", color: "beige" };
 const MAX_EVENTS = 30;
 
@@ -81,6 +81,23 @@ export class LocalStore {
     return migrate(raw, this.now());
   }
   hasLocalState() { return !!this.readJson(LOCAL_KEYS.state); }
+
+  // ---- memories (local mode keeps them on the device; photos are data URLs) ----
+  memories() { const m = this.readJson(LOCAL_KEYS.memories); return Array.isArray(m) ? m : []; }
+  async listMemories({ before = null, limit = 20 } = {}) {
+    let list = this.memories().sort((a, b) => Date.parse(b.happened_at) - Date.parse(a.happened_at));
+    if (before) list = list.filter((m) => Date.parse(m.happened_at) < Date.parse(before));
+    return list.slice(0, limit);
+  }
+  async addMemory({ kind, key = null, caption = null, photoPath = null, happenedAt = null }) {
+    const list = this.memories();
+    if (key && list.some((m) => m.key === key)) return list.find((m) => m.key === key);
+    const row = { id: `m-${Date.now()}-${Math.floor(Math.random() * 1e6)}`, kind, key, caption, photo_path: photoPath, partner_id: kind === "moment" ? this.meta?.partner.id ?? "local" : null, happened_at: new Date(happenedAt ?? this.now()).toISOString(), created_at: new Date(this.now()).toISOString() };
+    list.push(row); this.set(LOCAL_KEYS.memories, JSON.stringify(list)); return row;
+  }
+  async deleteMemory(id) { this.set(LOCAL_KEYS.memories, JSON.stringify(this.memories().filter((m) => m.id !== id))); }
+  async uploadPhoto(blob) { return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(blob); }); }
+  async signedUrl(path) { return path; }
 }
 
 function safeLocalStorage() {

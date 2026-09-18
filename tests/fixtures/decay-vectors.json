@@ -1,0 +1,11 @@
+{
+  "description": "Shared decay test vectors. src/game/decay.js (JS) and supabase/functions/nudge/decay.ts (Deno) must both reproduce these. Times in ms; needs before/after; asleep flag; elapsed in hours.",
+  "vectors": [
+    { "name": "1h awake", "asleep": false, "elapsedHours": 1, "before": { "fullness": 80, "fun": 80, "love": 80, "energy": 100 }, "after": { "fullness": 76, "fun": 77, "love": 78, "energy": 97 } },
+    { "name": "10h awake floors", "asleep": false, "elapsedHours": 10, "before": { "fullness": 30, "fun": 80, "love": 80, "energy": 20 }, "after": { "fullness": 10, "fun": 50, "love": 60, "energy": 10 } },
+    { "name": "2h asleep", "asleep": true, "elapsedHours": 2, "before": { "fullness": 80, "fun": 80, "love": 80, "energy": 40 }, "after": { "fullness": 76, "fun": 78, "love": 78, "energy": 70 } },
+    { "name": "asleep caps energy at 100", "asleep": true, "elapsedHours": 8, "before": { "fullness": 50, "fun": 50, "love": 50, "energy": 90 }, "after": { "fullness": 34, "fun": 42, "love": 42, "energy": 100 } },
+    { "name": "below floor stays", "asleep": false, "elapsedHours": 1, "before": { "fullness": 4, "fun": 80, "love": 80, "energy": 80 }, "after": { "fullness": 4, "fun": 77, "love": 78, "energy": 77 } },
+    { "name": "negative elapsed is zero", "asleep": false, "elapsedHours": -5, "before": { "fullness": 80, "fun": 80, "love": 80, "energy": 80 }, "after": { "fullness": 80, "fun": 80, "love": 80, "energy": 80 } }
+  ]
+}

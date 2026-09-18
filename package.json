@@ -5,6 +5,7 @@
   "scripts": {
     "test": "node --no-warnings=ExperimentalWarning --test \"tests/**/*.test.js\"",
     "test:db": "node --no-warnings=ExperimentalWarning --test \"tests/db/*.test.js\"",
-    "serve": "python3 -m http.server 8000"
+    "serve": "python3 -m http.server 8000",
+    "e2e": "node --no-warnings=ExperimentalWarning tests/e2e/run.mjs"
   }
 }

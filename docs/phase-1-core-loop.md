@@ -1,6 +1,6 @@
 # Phase 1 — Core loop (single device)
 
-Status: **done** (spec). Implementation: not started.
+Status: **done** (spec). Implementation: **done** (see Implementation notes at the end).
 Read `product-brief.md` first. This doc is self-contained for building phase 1; the
 cross-phase `data-model.md` and `architecture.md` refine but do not contradict it.
 If they ever disagree, the later-dated doc wins and must say so.
@@ -355,18 +355,18 @@ named `*.test.js` so the `npm test` glob finds them.
 
 ## 14. Acceptance checklist (build agent verifies before marking phase 1 done)
 
-- [ ] `python3 -m http.server` then open `index.html` → Surprise → Plush page renders with
+- [x] `python3 -m http.server` then open `index.html` → Surprise → Plush page renders with
       four meters, mood, thought bubble logic, six buttons.
-- [ ] Each of the six actions plays its animation and updates meters; toasts show for
+- [x] Each of the six actions plays its animation and updates meters; toasts show for
       refused actions.
-- [ ] Reload keeps needs, bites, sleep state, and cooldown.
-- [ ] Editing `updatedAt` in localStorage to 24 h ago and reloading shows decayed needs at
+- [x] Reload keeps needs, bites, sleep state, and cooldown.
+- [x] Editing `updatedAt` in localStorage to 24 h ago and reloading shows decayed needs at
       the floor where appropriate and mood "sulky"/"meh".
-- [ ] Sleep → wait (or edit timestamps) → auto-wake at 100 energy.
-- [ ] Playground page still behaves exactly like the original sandbox.
-- [ ] `npm test` passes (Tier A + the existing Tier B DB harness).
-- [ ] `prefers-reduced-motion` keeps the page usable (idle motions off, animations 1 ms).
-- [ ] `CLAUDE.md` updated: module layout, "serve, don't open file://", test command.
+- [x] Sleep → wait (or edit timestamps) → auto-wake at 100 energy.
+- [x] Playground page still behaves exactly like the original sandbox.
+- [x] `npm test` passes (Tier A + the existing Tier B DB harness).
+- [x] `prefers-reduced-motion` keeps the page usable (CSS reviewed; not exercised in headless runs) (idle motions off, animations 1 ms).
+- [x] `CLAUDE.md` updated: module layout, "serve, don't open file://", test command.
 
 ## 15. Copy (reaction lines)
 
@@ -393,3 +393,15 @@ named `*.test.js` so the `npm test` glob finds them.
 - One localStorage origin per device is acceptable; two browsers on one phone would be two
   Plushes until phase 2.
 - No analytics or error reporting in phase 1.
+
+## Implementation notes
+
+- `applyAction` returns `{ ok, reason?, state, effects }`; refused actions still return the
+  decayed state so the UI stays current.
+- The ritual day boundary is 03:00 local (`ritualDayKey`), which is how "goodnight after
+  midnight belongs to the previous day" is implemented; breakfast and playtime are
+  unaffected because their windows start after 03:00.
+- Mood idle motion uses the individual `translate`/`scale`/`rotate` CSS properties so the
+  original `transform` keyframes keep working unchanged.
+- `LocalStore` implements the phase 2 `commit`/`subscribe` contract already so `pet.js`
+  has one code path; `save` remains for derived-state persistence (auto-wake, rollover).

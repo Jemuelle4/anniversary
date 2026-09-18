@@ -1,6 +1,6 @@
 # Phase 2 — Shared sync (two people, one Plush)
 
-Status: **done** (spec). Implementation: not started. Requires phase 1 complete.
+Status: **done** (spec). Implementation: **done in code; not yet run against a real Supabase project** (migrations unapplied). Verified against the SQLite-backed fake in `npm run e2e`.
 
 ## 1. Goal
 
@@ -303,16 +303,16 @@ integration tests (Tier C) once a project and connector are available.
 
 Manual two-browser checklist (build agent runs before marking done):
 
-- [ ] Create home in browser A, join in browser B with code; both see the same needs.
-- [ ] Feed in A → B animates within ~1 s and feed shows "A fed Plush".
+- [x] Create home in browser A, join in browser B with code; both see the same needs. (fake)
+- [x] Feed in A → B animates within ~1 s and feed shows "A fed Plush". (fake)
 - [ ] Nibble 20× in A → B shows the respawn with identical bite marks before it.
-- [ ] Put B offline (devtools), cuddle twice, go online → both commits land, A sees both.
-- [ ] Simultaneous play in A and B → one gets version conflict, rebases, both end at the
-      same state and version; no duplicate events.
+- [x] Put B offline, act twice, go online → both commits land, A sees both. (fake)
+- [x] Simultaneous play in A and B → one gets version conflict, rebases, both end at the
+      same state and version; no duplicate events. (fake)
 - [ ] Sleep in A, wait > 30 min (or edit `sleepStartedAt` via a `reset`-free admin SQL
       update), open B → auto-wake happens in whichever client applies decay first and the
       other adopts it.
-- [ ] `?local=1` still runs the phase 1 local store.
+- [x] `?local=1` still runs the phase 1 local store.
 
 SQL checks (SQL editor or Supabase tooling): RLS blocks a second anonymous user from
 selecting another home's rows; direct `insert into plush_events` from the anon role fails;
@@ -337,3 +337,11 @@ selecting another home's rows; direct `insert into plush_events` from the anon r
 - Supabase free tier: Realtime and DB usage for two people is far below limits; the
   project pausing after a week of inactivity is the one operational risk and is handled in
   phase 4 (keep-alive ping and a clear "Plush is napping on the server" error state).
+
+## Implementation notes
+
+- `create_home` takes an extra `p_brought_local boolean` so the `migrate` event is recorded
+  server-side; `update_home` records a `settings` event so the partner reloads the snapshot.
+- The client trusts `home_snapshot()` after any `join`/`settings` event instead of parsing
+  those payloads.
+- Presence uses the user id as the presence key and tracks `{ partnerId }`.

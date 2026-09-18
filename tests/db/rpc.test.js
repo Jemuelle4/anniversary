@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { openDb, createHome, joinHome, commitAction, homeSnapshot, resetHome, leaveHome, selectAsUser, makeInviteCode, isValidState, CLOCK_SKEW_MS } from "./localDb.js";
+import { openDb, createHome, joinHome, commitAction, homeSnapshot, resetHome, leaveHome, selectAsUser, makeInviteCode, isValidState, updateHome, updatePartner, CLOCK_SKEW_MS } from "./localDb.js";
 import { initialState, withNeed } from "./fixtures.js";
 
 const T0 = Date.parse("2026-09-18T10:00:00Z");
@@ -157,6 +157,18 @@ test("invite code alphabet excludes ambiguous characters; is_valid_state checks 
   assert.equal(isValidState(initialState()), true);
   assert.equal(isValidState({ ...initialState(), asleep: "no" }), false);
   assert.equal(isValidState({ ...initialState(), bites: { seed: 1, count: 21 } }), false);
-  assert.equal(isValidState({ ...initialState(), version: 3, progress: { level: 11 } }), false);
-  assert.equal(isValidState({ ...initialState(), version: 3, progress: { level: 4 } }), true);
+  assert.equal(isValidState({ ...initialState(), progress: { level: 11 } }), false);
+  assert.equal(isValidState({ ...initialState(), progress: { level: 4 } }), true);
+});
+
+test("update_home and update_partner change settings, record a settings event, and return a snapshot", () => {
+  const { db } = pairedHome();
+  const snap = updateHome(db, { userId: "user-a", timezone: "Asia/Manila", anniversaryDate: "2021-09-18", now: T0 });
+  assert.equal(snap.home.timezone, "Asia/Manila");
+  assert.equal(snap.home.anniversary_date, "2021-09-18");
+  assert.equal(snap.events[0].type, "settings");
+  const s2 = updatePartner(db, { userId: "user-b", name: "Alexa", color: "mint" });
+  const me = s2.partners.find((p) => p.id === s2.me.partner_id);
+  assert.equal(me.name, "Alexa"); assert.equal(me.color, "mint");
+  assert.throws(() => updatePartner(db, { userId: "nobody", name: "X" }), /not_member/);
 });

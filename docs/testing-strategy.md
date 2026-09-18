@@ -9,6 +9,7 @@ exactly which tests are deferred until a Supabase project and connector are avai
 |---|---|---|---|
 | A. Pure logic | Node, any machine | nothing | `npm test` (`node --test "tests/**/*.test.js"`) |
 | B. Local DB harness | Node ≥ 22.13 (`node:sqlite` built in) | nothing | `npm run test:db` |
+| B2. Browser end-to-end | headless Chromium (DevTools protocol, no Playwright) | Chromium at `/opt/pw-browsers/chromium` or `$CHROMIUM` | `npm run e2e` |
 | C. Supabase integration | a Supabase project (or `supabase start` locally) | project URL, anon key, service role key for setup, migrations applied | see section 5; **deferred** |
 
 Tier A is everything under `src/game`, `src/store/localStore.js`, and `src/sync/outbox.js`
@@ -45,6 +46,17 @@ Rules for the harness:
   migration is added here in the same commit.
 - Prefer adding a Tier B test to adding a Tier C test: if a behaviour can be proven
   against the harness, prove it there and let Tier C confirm parity.
+
+## 2b. Tier B2: browser end-to-end (built, passing)
+
+`tests/e2e/run.mjs` starts a static server and `tests/e2e/fakeSupabaseServer.mjs` (an HTTP
+front on the SQLite harness with a polling `/events` feed), launches headless Chromium, and
+runs two scenarios: `local.mjs` (single device, phase 1 loop, time travel, anniversary,
+memories, playground, landing) and `shared.mjs` (two isolated browser contexts: pairing with
+migration of a local Plush, deep-link join, live remote events, simultaneous commits
+converging, offline queue and flush, settings propagation, reload). The app is switched to
+the fake through the `window.__plushClientFactory` hook read by `src/sync/client.js`.
+Presence is a no-op in the fake; Realtime is emulated by polling.
 
 ## 3. Known differences between the harness and Postgres
 

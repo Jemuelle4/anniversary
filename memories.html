@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Memories</title>
+  <meta name="theme-color" content="#f6f6f6" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="page page-light" data-page="memories">
+  <main class="memories">
+    <header class="topbar">
+      <button class="dock-back" type="button" data-nav="surprise.html">Back</button>
+    </header>
+    <h1>Memories</h1>
+    <div class="mem-grid" id="memGrid"></div>
+    <button class="btn primary fab" id="addMoment" type="button">Add a moment</button>
+  </main>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
