@@ -22,8 +22,8 @@ then `product-brief.md`, then the phase doc you were asked to implement.
 | `docs/product-brief.md` | What Plush is, who it is for, principles, scope, phasing | done |
 | `docs/phase-1-core-loop.md` | Single-device pet loop: needs, actions, decay, moods, local persistence, tests | done |
 | `docs/phase-2-shared-sync.md` | Two-person shared state: Supabase schema, event log, realtime, offline queue, pairing | done |
-| `docs/phase-3-growth-and-memories.md` | Levels, streaks, rituals, memory journal, milestone celebrations | pending |
-| `docs/phase-4-polish-and-launch.md` | PWA, notifications, accessibility, error states, deploy to Vercel, launch checklist | pending |
+| `docs/phase-3-growth-and-memories.md` | Levels, streaks, rituals, memory journal, milestone celebrations | done |
+| `docs/phase-4-polish-and-launch.md` | PWA, notifications, accessibility, error states, deploy to Vercel, launch checklist | done |
 | `docs/architecture.md` | Cross-phase system overview, module layout, store adapter contract | pending |
 | `docs/data-model.md` | Canonical state schema and event catalogue across all phases | pending |
 | `docs/ui-spec.md` | Screens, layout, dock, stage, expression system, reuse of existing CSS animations | pending |
@@ -38,8 +38,8 @@ Status values: `pending` (not started), `in progress` (partially written, see no
 - [x] `docs/product-brief.md` written.
 - [x] `docs/phase-1-core-loop.md`
 - [x] `docs/phase-2-shared-sync.md`
-- [ ] `docs/phase-3-growth-and-memories.md`
-- [ ] `docs/phase-4-polish-and-launch.md`
+- [x] `docs/phase-3-growth-and-memories.md`
+- [x] `docs/phase-4-polish-and-launch.md`
 - [ ] `docs/architecture.md`
 - [ ] `docs/data-model.md`
 - [ ] `docs/ui-spec.md`
@@ -47,7 +47,7 @@ Status values: `pending` (not started), `in progress` (partially written, see no
 
 ## In-progress notes / next step
 
-Next: write `docs/phase-3-growth-and-memories.md`.
+Next: write `docs/architecture.md`, then `data-model.md`, `ui-spec.md`, `build-agent-guide.md`.
 
 ## Decisions made so far (summary; details live in the docs)
 
