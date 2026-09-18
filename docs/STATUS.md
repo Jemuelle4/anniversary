@@ -20,7 +20,7 @@ then `product-brief.md`, then the phase doc you were asked to implement.
 |---|---|---|
 | `docs/STATUS.md` | This checkpoint file | live |
 | `docs/product-brief.md` | What Plush is, who it is for, principles, scope, phasing | done |
-| `docs/phase-1-core-loop.md` | Single-device pet loop: needs, actions, decay, moods, local persistence, tests | pending |
+| `docs/phase-1-core-loop.md` | Single-device pet loop: needs, actions, decay, moods, local persistence, tests | done |
 | `docs/phase-2-shared-sync.md` | Two-person shared state: Supabase schema, event log, realtime, offline queue, pairing | pending |
 | `docs/phase-3-growth-and-memories.md` | Levels, streaks, rituals, memory journal, milestone celebrations | pending |
 | `docs/phase-4-polish-and-launch.md` | PWA, notifications, accessibility, error states, deploy to Vercel, launch checklist | pending |
@@ -36,7 +36,7 @@ Status values: `pending` (not started), `in progress` (partially written, see no
 - [x] Read existing app (`index.html`, `surprise.html`, `actions.html`, `app.js`, `styles.css`).
 - [x] `docs/STATUS.md` created.
 - [x] `docs/product-brief.md` written.
-- [ ] `docs/phase-1-core-loop.md`
+- [x] `docs/phase-1-core-loop.md`
 - [ ] `docs/phase-2-shared-sync.md`
 - [ ] `docs/phase-3-growth-and-memories.md`
 - [ ] `docs/phase-4-polish-and-launch.md`
@@ -47,7 +47,7 @@ Status values: `pending` (not started), `in progress` (partially written, see no
 
 ## In-progress notes / next step
 
-Next: write `docs/phase-1-core-loop.md`.
+Next: write `docs/phase-2-shared-sync.md`.
 
 ## Decisions made so far (summary; details live in the docs)
 
