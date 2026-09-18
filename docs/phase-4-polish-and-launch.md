@@ -96,7 +96,7 @@ subscription per 8 h).
 
 | Situation | Detection | UI |
 |---|---|---|
-| Supabase project paused (free tier idle) | fetch error with 5xx/`project paused` body on `home_snapshot` | Full-stage card "Plush is napping on the server" with Retry; local cache still shown dimmed. Prevention: the hourly `nudge` run and a Vercel cron `GET /api/ping` are **not** available without a serverless function; instead `nudge` itself keeps the project active. If reminders are not configured, document that one partner opening the app weekly is sufficient. |
+| Supabase project paused (free tier idle) | fetch error with 5xx/`project paused` body on `home_snapshot` | Full-stage card "Plush is napping on the server" with Retry; local cache still shown dimmed. Prevention: the hourly `nudge` run keeps the project active. If reminders are not configured, one partner opening the app weekly is sufficient; say so in `CLAUDE.md`. |
 | No network on first ever open | no cache, fetch fails | "Plush needs internet the first time" with Retry. |
 | Anonymous session lost | `getSession()` null, no member | Pairing sheet with "Welcome back? Enter your code and the same name." |
 | Invite code wrong / home full | RPC error codes | Inline errors (phase 2 copy). |

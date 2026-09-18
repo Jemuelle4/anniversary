@@ -52,8 +52,10 @@ The store contract (final):
  */
 ```
 
-`LocalStore` (phase 1) implements the same four methods so the controller has one code
-path; phase 1 may ship `commit` as "apply and save" and `subscribe` as a no-op.
+Phase 1 ships `LocalStore` with `load`/`save`/`clear` only (phase 1 section 11). Phase 2
+adds `commit` and `subscribe` to the interface; `LocalStore.commit` wraps `save` and
+increments a local version, and `LocalStore.subscribe` is a no-op, so the controller has
+one code path from phase 2 on.
 
 ## 3. Data flow for one action
 

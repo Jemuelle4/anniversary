@@ -15,3 +15,11 @@ A small static anniversary web app: plain HTML/CSS/JS with no build step, bundle
 - `photos/` — static images referenced by `index.html`.
 
 There is no routing framework: navigation between pages is literal `window.location.href` changes between static HTML files.
+
+## Planned product: Plush (design docs)
+
+The app is being evolved into "Plush", a shared, persistent virtual pet for the couple.
+The design and implementation-ready specs live under `docs/`. Start with `docs/STATUS.md`,
+then `docs/product-brief.md`, then `docs/build-agent-guide.md` before implementing any
+phase. The architecture notes above describe the current code, which phase 1 refactors
+into ES modules under `src/` (see `docs/phase-1-core-loop.md`).
