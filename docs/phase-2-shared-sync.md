@@ -285,7 +285,12 @@ phase 2.
 
 ## 10. Tests
 
-`node --test`:
+DB architecture tests already exist and pass in `tests/db/` (SQLite mirror of the schema
+and a JS reference implementation of every RPC above). See `docs/testing-strategy.md`:
+port the Postgres RPCs from `tests/db/localDb.js`, and implement the deferred Supabase
+integration tests (Tier C) once a project and connector are available.
+
+`npm test` (Tier A):
 
 - `outbox.test.js` (pure reducer): enqueue/flush order; duplicate → done; version
   conflict rebases remaining events with fresh `expectedVersion`; refused-after-rebase

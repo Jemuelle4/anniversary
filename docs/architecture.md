@@ -116,6 +116,7 @@ Sheets (pairing, activity, settings, add moment, menu) are in-page overlays on
 | 8 | Single `plush.png` + CSS for moods and levels | Art per mood | No art dependency; art slots optional |
 | 9 | One Edge Function (reminders) with a duplicated 20-line decay | Reuse `src/game` in Deno | Bundling `src/` from outside the functions dir is uncertain; a test vector pins the copy |
 | 10 | Keep `surprise.html` filename for the pet page | New `plush.html` | The original gift link keeps working |
+| 11 | SQLite harness (`node:sqlite`) as executable spec for the RPCs | Waiting for Supabase; mocking the client | Zero dependencies, proves the CAS protocol today, ports 1:1 to PL/pgSQL |
 
 ## 8. Non-functional targets
 

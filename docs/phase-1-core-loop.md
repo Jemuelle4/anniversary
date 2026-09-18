@@ -329,10 +329,11 @@ mechanical.
 - `lastAction` gets a `by` field in phase 2; render code should tolerate its absence.
 - `stage.js` exposes `play(effects)` so a partner's remote actions replay identically.
 
-## 13. Tests (`node --test tests/`)
+## 13. Tests (`npm test`)
 
-Node 18+ with the built-in runner. No test dependencies. Every test constructs states
-with a fixed `now`.
+Node 22.13+ with the built-in runner (the DB harness in `tests/db/` needs `node:sqlite`).
+No test dependencies. Every test constructs states with a fixed `now`. Test files are
+named `*.test.js` so the `npm test` glob finds them.
 
 - `decay.test.js`: 1 h awake drops fullness by 4; asleep energy rises 15/h and other needs
   use asleep rates; floor at 10; clock backwards → no change; auto-wake after ≥30 min at
@@ -363,7 +364,7 @@ with a fixed `now`.
       the floor where appropriate and mood "sulky"/"meh".
 - [ ] Sleep → wait (or edit timestamps) → auto-wake at 100 energy.
 - [ ] Playground page still behaves exactly like the original sandbox.
-- [ ] `node --test tests/` passes.
+- [ ] `npm test` passes (Tier A + the existing Tier B DB harness).
 - [ ] `prefers-reduced-motion` keeps the page usable (idle motions off, animations 1 ms).
 - [ ] `CLAUDE.md` updated: module layout, "serve, don't open file://", test command.
 

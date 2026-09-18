@@ -7,16 +7,17 @@ Status: **done**. Read this before implementing any phase.
 1. `docs/STATUS.md` (what exists, what is in progress)
 2. `docs/product-brief.md`
 3. `docs/architecture.md` and `docs/data-model.md`
-4. The phase doc you are implementing, then `docs/ui-spec.md` for visuals.
+4. `docs/testing-strategy.md`
+5. The phase doc you are implementing, then `docs/ui-spec.md` for visuals.
 
 Phases are implemented in order; do not start phase N+1 until phase N's acceptance
 checklist is ticked in its doc (edit the checkboxes in the phase doc and commit).
 
 ## 2. Ground rules
 
-- **No bundler, no framework, no package.json for the app.** ES modules only. A
-  `package.json` with just `{ "scripts": { "test": "node --test tests/" } }` is allowed
-  for convenience; no dependencies.
+- **No bundler, no framework, no dependencies.** ES modules only. `package.json` exists
+  for scripts (`test`, `test:db`, `serve`) and `"type": "module"`; it must never gain a
+  `dependencies` or `devDependencies` block.
 - **Serve, don't open.** ES modules need http. `python3 -m http.server 8000` or
   `npx serve .`. Update `CLAUDE.md` to say this in phase 1.
 - **The gift is sacred.** `index.html`'s look, the two photos, the headline, the
@@ -44,6 +45,8 @@ app.js  config.js  sw.js  manifest.webmanifest  vercel.json
 styles.css  plush.png  icons/  photos/
 src/game/  src/store/  src/sync/  src/ui/  src/pet.js
 tests/            node --test suites + tests/fixtures/decay-vectors.json
+tests/db/         SQLite harness: schema.sql, localDb.js (RPC reference), rpc.test.js
+tests/supabase/   deferred Tier C integration tests (skip without SUPABASE_URL)
 supabase/migrations/0001_plush_homes.sql  0002_memories.sql  0003_push.sql
 supabase/functions/nudge/index.ts
 docs/
@@ -52,9 +55,12 @@ docs/
 ## 4. Commands
 
 ```
-python3 -m http.server 8000        # run the app at http://localhost:8000/
-node --test tests/                 # unit tests (Node 18+)
+npm run serve      # python3 -m http.server 8000 → http://localhost:8000/
+npm test           # all node --test suites: tests/**/*.test.js (Node 22.13+)
+npm run test:db    # only the SQLite DB harness in tests/db/
 ```
+
+Test tiers and what is deferred until Supabase is available: `docs/testing-strategy.md`.
 
 Applying migrations: paste each file from `supabase/migrations/` into the Supabase SQL
 editor in order, or use Supabase tooling (`supabase db push` with the CLI, or the

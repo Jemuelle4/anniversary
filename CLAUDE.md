@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-A small static anniversary web app: plain HTML/CSS/JS with no build step, bundler, package manager, or test suite. Open any `.html` file directly in a browser (or serve the directory with any static file server) to run it.
+A small static anniversary web app: plain HTML/CSS/JS with no build step, bundler, or dependencies. Open any `.html` file directly in a browser (or serve the directory with any static file server) to run it. `npm test` runs the Node built-in test runner over `tests/**/*.test.js` (Node 22.13+; `tests/db/` is a SQLite harness for the planned database, see `docs/testing-strategy.md`).
 
 ## Architecture
 

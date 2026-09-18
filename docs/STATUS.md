@@ -28,6 +28,8 @@ then `product-brief.md`, then the phase doc you were asked to implement.
 | `docs/data-model.md` | Canonical state schema and event catalogue across all phases | done |
 | `docs/ui-spec.md` | Screens, layout, dock, stage, expression system, reuse of existing CSS animations | done |
 | `docs/build-agent-guide.md` | Conventions for implementers: no build step, ES modules, `node --test`, acceptance checks, commit rules | done |
+| `docs/testing-strategy.md` | Test tiers; SQLite harness (built); deferred Supabase integration tests | done |
+| `tests/db/*` | SQLite schema mirror + JS RPC reference + 16 passing tests (`npm run test:db`) | done |
 
 Status values: `pending` (not started), `in progress` (partially written, see note), `done`.
 
@@ -46,6 +48,11 @@ Status values: `pending` (not started), `in progress` (partially written, see no
 - [x] `docs/build-agent-guide.md`
 
 ## Final state of this session
+
+Follow-up: per user request, a local SQLite harness (`tests/db/`, `node:sqlite`, no
+dependencies) was added to test the DB architecture without Supabase, and
+`docs/testing-strategy.md` lists the Supabase-only tests deferred to a session that has
+the connector. This is test infrastructure, not application code.
 
 All ten docs are complete and pushed. A consistency pass reconciled the store interface
 wording between `phase-1-core-loop.md`, `phase-2-shared-sync.md`, and `architecture.md`,
@@ -69,3 +76,5 @@ All planned docs are done. Next for a build session: implement phase 1 per
 4. The four existing animations (throw, bite, explode, cuddle) are kept and given
    game meaning; two care actions (feed, tuck in) are added.
 5. Pure game logic lives in DOM-free modules tested with `node --test`.
+6. DB architecture is verified locally against a SQLite mirror; Supabase integration
+   tests are specified but deferred (`docs/testing-strategy.md` §5).
