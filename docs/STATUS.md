@@ -24,10 +24,10 @@ then `product-brief.md`, then the phase doc you were asked to implement.
 | `docs/phase-2-shared-sync.md` | Two-person shared state: Supabase schema, event log, realtime, offline queue, pairing | done |
 | `docs/phase-3-growth-and-memories.md` | Levels, streaks, rituals, memory journal, milestone celebrations | done |
 | `docs/phase-4-polish-and-launch.md` | PWA, notifications, accessibility, error states, deploy to Vercel, launch checklist | done |
-| `docs/architecture.md` | Cross-phase system overview, module layout, store adapter contract | pending |
-| `docs/data-model.md` | Canonical state schema and event catalogue across all phases | pending |
-| `docs/ui-spec.md` | Screens, layout, dock, stage, expression system, reuse of existing CSS animations | pending |
-| `docs/build-agent-guide.md` | Conventions for implementers: no build step, ES modules, `node --test`, acceptance checks, commit rules | pending |
+| `docs/architecture.md` | Cross-phase system overview, module layout, store adapter contract | done |
+| `docs/data-model.md` | Canonical state schema and event catalogue across all phases | done |
+| `docs/ui-spec.md` | Screens, layout, dock, stage, expression system, reuse of existing CSS animations | done |
+| `docs/build-agent-guide.md` | Conventions for implementers: no build step, ES modules, `node --test`, acceptance checks, commit rules | done |
 
 Status values: `pending` (not started), `in progress` (partially written, see note), `done`.
 
@@ -40,14 +40,15 @@ Status values: `pending` (not started), `in progress` (partially written, see no
 - [x] `docs/phase-2-shared-sync.md`
 - [x] `docs/phase-3-growth-and-memories.md`
 - [x] `docs/phase-4-polish-and-launch.md`
-- [ ] `docs/architecture.md`
-- [ ] `docs/data-model.md`
-- [ ] `docs/ui-spec.md`
-- [ ] `docs/build-agent-guide.md`
+- [x] `docs/architecture.md`
+- [x] `docs/data-model.md`
+- [x] `docs/ui-spec.md`
+- [x] `docs/build-agent-guide.md`
 
 ## In-progress notes / next step
 
-Next: write `docs/architecture.md`, then `data-model.md`, `ui-spec.md`, `build-agent-guide.md`.
+All planned docs are done. Next for a build session: implement phase 1 per
+`docs/phase-1-core-loop.md` following `docs/build-agent-guide.md`.
 
 ## Decisions made so far (summary; details live in the docs)
 
