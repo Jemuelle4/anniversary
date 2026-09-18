@@ -21,7 +21,7 @@ then `product-brief.md`, then the phase doc you were asked to implement.
 | `docs/STATUS.md` | This checkpoint file | live |
 | `docs/product-brief.md` | What Plush is, who it is for, principles, scope, phasing | done |
 | `docs/phase-1-core-loop.md` | Single-device pet loop: needs, actions, decay, moods, local persistence, tests | done |
-| `docs/phase-2-shared-sync.md` | Two-person shared state: Supabase schema, event log, realtime, offline queue, pairing | pending |
+| `docs/phase-2-shared-sync.md` | Two-person shared state: Supabase schema, event log, realtime, offline queue, pairing | done |
 | `docs/phase-3-growth-and-memories.md` | Levels, streaks, rituals, memory journal, milestone celebrations | pending |
 | `docs/phase-4-polish-and-launch.md` | PWA, notifications, accessibility, error states, deploy to Vercel, launch checklist | pending |
 | `docs/architecture.md` | Cross-phase system overview, module layout, store adapter contract | pending |
@@ -37,7 +37,7 @@ Status values: `pending` (not started), `in progress` (partially written, see no
 - [x] `docs/STATUS.md` created.
 - [x] `docs/product-brief.md` written.
 - [x] `docs/phase-1-core-loop.md`
-- [ ] `docs/phase-2-shared-sync.md`
+- [x] `docs/phase-2-shared-sync.md`
 - [ ] `docs/phase-3-growth-and-memories.md`
 - [ ] `docs/phase-4-polish-and-launch.md`
 - [ ] `docs/architecture.md`
@@ -47,13 +47,15 @@ Status values: `pending` (not started), `in progress` (partially written, see no
 
 ## In-progress notes / next step
 
-Next: write `docs/phase-2-shared-sync.md`.
+Next: write `docs/phase-3-growth-and-memories.md`.
 
 ## Decisions made so far (summary; details live in the docs)
 
 1. Plush is one shared pet for exactly two people (the couple). Not multiplayer beyond that.
 2. Stack stays plain HTML/CSS/JS with no bundler. ES modules served by a static server.
    Supabase (Postgres + Realtime + anonymous auth) for shared persistence from phase 2.
+   Actions are applied client-side and committed via a compare-and-swap RPC (no SQL or
+   Edge Function port of the game rules).
    Vercel for hosting from phase 4 (any static host works).
 3. Phase 1 is fully playable on one device with `localStorage`, behind a `Store`
    interface so phase 2 swaps in Supabase without touching game logic.

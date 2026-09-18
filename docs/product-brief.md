@@ -57,9 +57,10 @@ Design consequences:
 3. **Logic is pure, UI is thin.** Needs, decay, moods, and action effects are pure
    functions over a plain state object. The DOM layer only renders state and dispatches
    actions. This is what makes the game testable without a browser.
-4. **Server-authoritative shared state.** From phase 2, the database applies actions and
-   computes the resulting state; clients never write derived state directly. This
-   avoids two-device conflicts by construction.
+4. **One source of truth for shared state.** From phase 2, the database row for the pet
+   is the single source of truth and every write goes through one atomic
+   compare-and-swap RPC. Two devices can never overwrite each other; the loser rebases.
+   (Game arithmetic runs on the client in the same pure modules phase 1 tests.)
 5. **Time is real time.** Decay is computed lazily from timestamps, never from timers
    that must be running. A closed tab is the normal case.
 6. **Never punishing, always recoverable.** Every bad state (starving, sulking, fully
